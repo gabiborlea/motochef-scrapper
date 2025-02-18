@@ -6,6 +6,19 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import platform
 import time
+from crawl4ai import AsyncWebCrawler
+import asyncio
+
+async def get_markdown(url, title):
+    async with AsyncWebCrawler() as crawler:
+        result = await crawler.arun(url=url)
+        try: 
+            f = open('markdowns/' + title + '.md', 'x')
+            f.write(result.markdown)
+            #save to file
+            f.close()
+        except Exception:
+            print('error')
 
 class WebScraper:
     def __init__(self):
@@ -60,11 +73,10 @@ class WebScraper:
             
             links = body.find_elements(By.TAG_NAME, "h4")
             for link in links:
-                link = link.find_element(By.TAG_NAME, "a")
-                print('title:')
-                print(link.text)
-                print('url:')
-                print(link.get_attribute("href"))
+                a_tag = link.find_element(By.TAG_NAME, "a")
+                url = a_tag.get_attribute("href")
+                title = a_tag.text
+                asyncio.run(get_markdown(url, title))
             
         except Exception as e:
             print(f"An error occurred: {str(e)}")
