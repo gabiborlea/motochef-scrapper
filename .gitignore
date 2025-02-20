@@ -1,3 +1,5 @@
 venv
 __pycache__
 
+markdowns
+.DS_Store
